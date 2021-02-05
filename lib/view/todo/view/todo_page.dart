@@ -13,9 +13,8 @@ class TodoPage extends ConsumerWidget {
     return Scaffold(
       appBar: buildAppBar,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context
-            .read(todoProvider)
-            .addTodo(Todo(title: title.text ?? "", completed: false)),
+        onPressed: () =>
+            context.read(todoProvider).addTodo(Todo(title: title.text ?? "", completed: false)),
       ),
       body: Padding(
         padding: EdgeInsets.all(context.height / 65),
@@ -37,19 +36,19 @@ class TodoPage extends ConsumerWidget {
       );
 
   ListView buildListView(List<Todo> todoList) {
-    return ListView.builder(
-      itemCount: todoList.length,
-      itemBuilder: (context, index) => Card(
-        child: ListTile(
-            title: Text(todoList[index].title),
-            leading: IconButton(
-              onPressed: () =>
-                  todoList[index].completed = !todoList[index].completed,
-              icon: todoList[index].completed == false
-                  ? Icon(Icons.check_box_outline_blank)
-                  : Icon(Icons.check_box),
-            )),
-      ),
+    return ListView(
+      children: todoList
+          .map((todo) => Card(
+                child: ListTile(
+                    title: Text(todo.title),
+                    leading: IconButton(
+                      onPressed: () => todo.completed = !todo.completed,
+                      icon: todo.completed == false
+                          ? Icon(Icons.check_box_outline_blank)
+                          : Icon(Icons.check_box),
+                    )),
+              ))
+          .toList(),
     );
   }
 }
