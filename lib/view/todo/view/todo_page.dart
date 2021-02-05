@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:riverpod_todo/core/extensions/context_extensions.dart';
 import 'package:riverpod_todo/view/todo/model/todo_model.dart';
 import 'package:riverpod_todo/view/todo/view_model/todo_provider.dart';
 
 class TodoPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ScopedReader watch) {
+    TextEditingController title = TextEditingController();
     final todoWatcher = watch(todoProvider);
     final todoList = todoWatcher.todoList;
     return Scaffold(
@@ -13,9 +15,20 @@ class TodoPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context
             .read(todoProvider)
-            .addTodo(Todo(title: 'başlık', completed: false)),
+            .addTodo(Todo(title: title.text ?? "", completed: false)),
       ),
-      body: buildListView(todoList),
+      body: Padding(
+        padding: EdgeInsets.all(context.height / 65),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: title,
+              onSaved: (value) => title.text = value,
+            ),
+            Expanded(child: buildListView(todoList)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -28,11 +41,14 @@ class TodoPage extends ConsumerWidget {
       itemCount: todoList.length,
       itemBuilder: (context, index) => Card(
         child: ListTile(
-          title: Text(todoList[index].title),
-          leading: todoList[index].completed == false
-              ? Icon(Icons.check_box_outline_blank)
-              : Icon(Icons.check_box),
-        ),
+            title: Text(todoList[index].title),
+            leading: IconButton(
+              onPressed: () =>
+                  todoList[index].completed = !todoList[index].completed,
+              icon: todoList[index].completed == false
+                  ? Icon(Icons.check_box_outline_blank)
+                  : Icon(Icons.check_box),
+            )),
       ),
     );
   }
